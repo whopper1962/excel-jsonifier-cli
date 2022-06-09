@@ -10,7 +10,6 @@ const ALL_FILE_NAMES = FILE_SYSTEM.readdirSync(`${CURRENT_DIRECTORY_PATH}/target
 const FILE_NAMES = ALL_FILE_NAMES.filter(((name) => {
   return name !== '.gitkeep' && (name.indexOf('~$') === -1);
 }));
-
 let EXCEL_FILE_CONTENTS = '';
 let COLUMN_RANGE = '';
 let MIN_RANGE_NUMBER = '';
@@ -32,6 +31,7 @@ let EXCEL_DATA = {
 let UNDEFINED_KEY_CELL = [];
 let UNDEFINED_VALUE_CELL = [];
 let IS_DELETE_FLAG_NEEDED = false;
+let EOL_VALUE
 
 start();
 
@@ -112,10 +112,7 @@ async function getData () {
     await getNumberOfParentKeysData(NUMBER_OF_COLUMNS);
     userInterfaceKeyColumnSelecter();
   } else if (SHEET_COLUMNS.length < 2) {
-    console.log('\r\n===================================================='.yellow);
-    console.log('JSONの作成にはデータが1つ以上必要です。');
-    console.log('データの数が下限(1つ)未満、または全てのデータに削除フラグが適用されています。');
-    console.log('===================================================='.yellow, '\r\n');
+    displayMessage('JSONの作成にはデータが1つ以上必要です。\r\nデータの数が下限(1つ)未満、または全てのデータに削除フラグが適用されています。');
   } else {
     userInterfaceKeyColumnSelecter();
   }
@@ -157,13 +154,12 @@ async function userInterfaceKeyColumnSelecter () {
   const valueColumnResult = await QUESTIONS.userInfoValueColumnSelecter(SHEET_COLUMNS);
   VALUE_COLUMN = valueColumnResult.selectedValueColumn;
   answer.selectedValueColumn = VALUE_COLUMN;
+  await getEolValueInterface();
   const isConfirmedResult = await QUESTIONS.userInfoConfirmation();
   if (isConfirmedResult.confirmed === 'YES') {
     getFileInfo(answer);
   } else {
-    console.log('\r\n===================================================='.yellow);
-    console.log('初めから情報を入力してください。');
-    console.log('===================================================='.yellow, '\r\n');
+    displayMessage('初めから情報を入力してください。');
     initData();
     getData();
   }
@@ -175,7 +171,7 @@ function checkDeleteFlag (targetIndex) {
   }
 }
 
-function getFileInfo (answer) {
+async function getFileInfo (answer) {
   let objectBlueprint = [];
   for (let i = MIN_RANGE_NUMBER; i <= MAX_RANGE_NUMBER; i++) {
     let objectBlueprintData = {
@@ -211,23 +207,16 @@ function getFileInfo (answer) {
     objectBlueprint.push(objectBlueprintData);
   }
   if (objectBlueprint.length < 1) {
-    console.log('\r\n===================================================='.yellow);
-    console.log('JSONの作成にはデータが1つ以上必要です。');
-    console.log('データの数が下限(1つ)未満、または全てのデータに削除フラグが適用されています。');
-    console.log('===================================================='.yellow, '\r\n');
+    displayMessage('JSONの作成にはデータが1つ以上必要です。\r\nデータの数が下限(1つ)未満、または全てのデータに削除フラグが適用されています。');
     return;
   }
   const isNumberOfKeysAndValuesEqual = DUPLICATE_CHECKER.checkNumberOfKeysAndValues(objectBlueprint);
   if (isNumberOfKeysAndValuesEqual) {
     const duplicateCheckResults = DUPLICATE_CHECKER.checkKeyDuplicate(objectBlueprint);
     if (duplicateCheckResults.isDuplicated) {
-      console.log('\r\n===================================================='.yellow);
-      console.log('重複したキーを検知した為、処理を中断しました。');
-      console.log('以下のキーを確認してください。')
-      console.log(duplicateCheckResults.duplicatedKey.green);
-      console.log('===================================================='.yellow, '\r\n');
+      displayMessage('重複したキーを検知した為、処理を中断しました。\r\n以下のキーを確認してください。\r\n', duplicateCheckResults.duplicatedKey.green);
     } else {
-      OBJECT_TO_JSON = OBJECT_CREATOR.createObjectBasedOnBlueprint(objectBlueprint);
+      OBJECT_TO_JSON = OBJECT_CREATOR.createObjectBasedOnBlueprint(objectBlueprint, EOL_VALUE);
       generateJSON();
     }
   } else {
@@ -243,12 +232,38 @@ function getFileInfo (answer) {
   }
 }
 
+async function getEolValueInterface () {
+  let eolValueInterfaceResult = await QUESTIONS.getEolValue();
+  if (eolValueInterfaceResult.selectedEolValue === 'その他文字列') {
+    let anotherEolValueResult = await QUESTIONS.getAnotherEolValue();
+    EOL_VALUE = anotherEolValueResult.inputedAnotherEolValue;
+  }
+  switch (eolValueInterfaceResult.selectedEolValue) {
+    case '削除': {
+      EOL_VALUE = '';
+      break;
+    }
+    case '<br>': {
+      EOL_VALUE = '<br>';
+      break;
+    }
+    case '改行コード': {
+      EOL_VALUE = false
+      break;
+    }
+  }
+}
+
 async function generateJSON () {
   const result = await QUESTIONS.userInfoJSONFileName();
   const fileName = result.selectedJSONFileName;
   const json = JSON.stringify(OBJECT_TO_JSON, null, 4);
   FILE_SYSTEM.writeFileSync(`${CURRENT_DIRECTORY_PATH}/generated_json/${fileName}.json`, json);
+  displayMessage('JSONファイル(' + `${fileName}.json`.green + ')が正常に作成されました。');
+}
+
+function displayMessage (message) {
   console.log('\r\n===================================================='.yellow);
-  console.log('JSONファイル(' + `${fileName}.json`.green + ')が正常に作成されました。');
+  console.log(message);
   console.log('===================================================='.yellow, '\r\n');
 }
