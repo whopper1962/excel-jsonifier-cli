@@ -22,6 +22,7 @@
   "homepage": "https://github.com/whopper1962/exceljsonifier#readme",
   "dependencies": {
     "colors": "^1.4.0",
+    "exceljs": "^4.3.0",
     "inquirer": "^8.2.0",
     "xlsx": "^0.18.3"
   }

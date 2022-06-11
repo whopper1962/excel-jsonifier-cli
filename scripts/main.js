@@ -2,9 +2,9 @@ const XLSX = require('xlsx');
 const { exec } = require('child_process');
 const FILE_SYSTEM = require('fs');
 const CURRENT_DIRECTORY_PATH = process.cwd();
-const QUESTIONS = require('../lib/interface');
-const OBJECT_CREATOR = require('../lib/objectCreator');
-const DUPLICATE_CHECKER = require('../lib/duplicateChecker');
+const QUESTIONS = require('../cr/interface');
+const OBJECT_CREATOR = require('../cr/objectCreator');
+const DUPLICATE_CHECKER = require('../cr/duplicateChecker');
 const COLORS = require('colors');
 const ALL_FILE_NAMES = FILE_SYSTEM.readdirSync(`${CURRENT_DIRECTORY_PATH}/target_excel/`);
 const FILE_NAMES = ALL_FILE_NAMES.filter(((name) => {
