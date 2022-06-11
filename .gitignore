@@ -1,4 +1,5 @@
 target_excel/*
 node_modules/*
-generated_json/*
+generated-json/*
+json-to-conversion/*
 !.gitkeep
