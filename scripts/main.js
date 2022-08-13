@@ -2,11 +2,12 @@ const XLSX = require('xlsx');
 const { exec } = require('child_process');
 const FILE_SYSTEM = require('fs');
 const CURRENT_DIRECTORY_PATH = process.cwd();
+const createXlsxFromJson  = require('./convertJson');
 const QUESTIONS = require('../lib/interface');
 const OBJECT_CREATOR = require('../lib/objectCreator');
 const DUPLICATE_CHECKER = require('../lib/duplicateChecker');
 const COLORS = require('colors');
-const ALL_FILE_NAMES = FILE_SYSTEM.readdirSync(`${CURRENT_DIRECTORY_PATH}/target_excel/`);
+const ALL_FILE_NAMES = FILE_SYSTEM.readdirSync(`${CURRENT_DIRECTORY_PATH}/target-xlsx/`);
 const FILE_NAMES = ALL_FILE_NAMES.filter(((name) => {
   return name !== '.gitkeep' && (name.indexOf('~$') === -1);
 }));
@@ -51,7 +52,12 @@ function executeShellScript () {
 
 async function start () {
   await executeShellScript();
-  getData();
+  const {selectedMode} = await QUESTIONS.selectConversionMode();
+  if (selectedMode === 'Excel to JSON') {
+    getData();
+  } else {
+    createXlsxFromJson();
+  }
 }
 
 function initData () {
@@ -79,7 +85,7 @@ function initData () {
 async function getData () {
   const result = await QUESTIONS.userInfoFileSelecter(FILE_NAMES);
   SELECTED_FILE = result.selectedFile;
-  EXCEL_FILE_CONTENTS = XLSX.readFile(`${CURRENT_DIRECTORY_PATH}/target_excel/${result.selectedFile}`);
+  EXCEL_FILE_CONTENTS = XLSX.readFile(`${CURRENT_DIRECTORY_PATH}/target-xlsx/${result.selectedFile}`);
   const sheetSelecterResult = await QUESTIONS.userInfoSheetSelecter(EXCEL_FILE_CONTENTS.Props.SheetNames);
   SELECTED_SHEET = sheetSelecterResult.selectedSheetName;
   COLUMN_RANGE = EXCEL_FILE_CONTENTS.Sheets[SELECTED_SHEET]['!ref'].split(':');
@@ -258,7 +264,7 @@ async function generateJSON () {
   const result = await QUESTIONS.userInfoJSONFileName();
   const fileName = result.selectedJSONFileName;
   const json = JSON.stringify(OBJECT_TO_JSON, null, 4);
-  FILE_SYSTEM.writeFileSync(`${CURRENT_DIRECTORY_PATH}/generated_json/${fileName}.json`, json);
+  FILE_SYSTEM.writeFileSync(`${CURRENT_DIRECTORY_PATH}/generated-json/${fileName}.json`, json);
   displayMessage('JSONファイル(' + `${fileName}.json`.green + ')が正常に作成されました。');
 }
 
