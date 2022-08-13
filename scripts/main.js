@@ -2,9 +2,10 @@ const XLSX = require('xlsx');
 const { exec } = require('child_process');
 const FILE_SYSTEM = require('fs');
 const CURRENT_DIRECTORY_PATH = process.cwd();
-const QUESTIONS = require('../cr/interface');
-const OBJECT_CREATOR = require('../cr/objectCreator');
-const DUPLICATE_CHECKER = require('../cr/duplicateChecker');
+const createXlsxFromJson  = require('./convertJson');
+const QUESTIONS = require('../lib/interface');
+const OBJECT_CREATOR = require('../lib/objectCreator');
+const DUPLICATE_CHECKER = require('../lib/duplicateChecker');
 const COLORS = require('colors');
 const ALL_FILE_NAMES = FILE_SYSTEM.readdirSync(`${CURRENT_DIRECTORY_PATH}/target_excel/`);
 const FILE_NAMES = ALL_FILE_NAMES.filter(((name) => {
@@ -51,7 +52,12 @@ function executeShellScript () {
 
 async function start () {
   await executeShellScript();
-  getData();
+  const {selectedMode} = await QUESTIONS.selectConversionMode();
+  if (selectedMode === 'Excel to JSON') {
+    getData();
+  } else {
+    createXlsxFromJson();
+  }
 }
 
 function initData () {
@@ -258,7 +264,7 @@ async function generateJSON () {
   const result = await QUESTIONS.userInfoJSONFileName();
   const fileName = result.selectedJSONFileName;
   const json = JSON.stringify(OBJECT_TO_JSON, null, 4);
-  FILE_SYSTEM.writeFileSync(`${CURRENT_DIRECTORY_PATH}/generated_json/${fileName}.json`, json);
+  FILE_SYSTEM.writeFileSync(`${CURRENT_DIRECTORY_PATH}/generated-json/${fileName}.json`, json);
   displayMessage('JSONファイル(' + `${fileName}.json`.green + ')が正常に作成されました。');
 }
 

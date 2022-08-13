@@ -12,9 +12,7 @@ let parsedJsonData = {}
 let excelDataBluePrint = {};
 let columnAlphas = [];
 
-main();
-
-async function main () {
+module.exports = async function main () {
   await createSheet();
   await selectJsonFile();
   await readJsonData();
@@ -41,6 +39,8 @@ async function createExcelFile () {
   try {
     const excelFileNameResult = await questions.userInfoExcelFileName();
     let fileName = excelFileNameResult.excelFileName;
+    // const excelFileName = `${fileName}.xlsx`;
+
     workbook.xlsx.writeFile(`${fileName}.xlsx`);
     displayMessage('Excelファイル(' + `${fileName}.xlsx`.green + ')が正常に作成されました。');
   } catch (error) {
