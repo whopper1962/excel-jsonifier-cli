@@ -27,7 +27,7 @@ async function createSheet () {
 }
 
 async function selectJsonFile () {
-  const jsonFiles = fileSystem.readdirSync(`${currentDirectory}/json-to-conversion/`);
+  const jsonFiles = fileSystem.readdirSync(`${currentDirectory}/json-to-convert/`);
   const filteredJsonFileNames = jsonFiles.filter((name) => {
     return name !== '.gitkeep';
   });
@@ -58,7 +58,7 @@ async function createExcel () {
 }
 
 async function readJsonData () {
-  let json = fileSystem.readFileSync(`${currentDirectory}/json-to-conversion/${selectedJsonFile}`, 'utf-8');
+  let json = fileSystem.readFileSync(`${currentDirectory}/json-to-convert/${selectedJsonFile}`, 'utf-8');
   parsedJsonData = JSON.parse(json);
 }
 

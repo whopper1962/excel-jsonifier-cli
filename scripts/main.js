@@ -7,7 +7,7 @@ const QUESTIONS = require('../lib/interface');
 const OBJECT_CREATOR = require('../lib/objectCreator');
 const DUPLICATE_CHECKER = require('../lib/duplicateChecker');
 const COLORS = require('colors');
-const ALL_FILE_NAMES = FILE_SYSTEM.readdirSync(`${CURRENT_DIRECTORY_PATH}/target_excel/`);
+const ALL_FILE_NAMES = FILE_SYSTEM.readdirSync(`${CURRENT_DIRECTORY_PATH}/target-xlsx/`);
 const FILE_NAMES = ALL_FILE_NAMES.filter(((name) => {
   return name !== '.gitkeep' && (name.indexOf('~$') === -1);
 }));
@@ -85,7 +85,7 @@ function initData () {
 async function getData () {
   const result = await QUESTIONS.userInfoFileSelecter(FILE_NAMES);
   SELECTED_FILE = result.selectedFile;
-  EXCEL_FILE_CONTENTS = XLSX.readFile(`${CURRENT_DIRECTORY_PATH}/target_excel/${result.selectedFile}`);
+  EXCEL_FILE_CONTENTS = XLSX.readFile(`${CURRENT_DIRECTORY_PATH}/target-xlsx/${result.selectedFile}`);
   const sheetSelecterResult = await QUESTIONS.userInfoSheetSelecter(EXCEL_FILE_CONTENTS.Props.SheetNames);
   SELECTED_SHEET = sheetSelecterResult.selectedSheetName;
   COLUMN_RANGE = EXCEL_FILE_CONTENTS.Sheets[SELECTED_SHEET]['!ref'].split(':');

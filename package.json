@@ -7,8 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "generate": "node ./scripts/main.js",
     "clear": "find ./generated_json -type f | grep -v -E '.gitkeep' | xargs rm -rf",
-    "dump": "find ./target_excel -type f | grep -v -E '.gitkeep' | xargs rm -rf",
-    "init": "npm run clear | npm run dump"
+    "dump": "find ./target-xlsx -type f | grep -v -E '.gitkeep' | xargs rm -rf",
+    "init": "npm run clear | npm run dump",
+    "sync-xlsx": "cp ./generated-xlsx/* ./target-xlsx/",
+    "sync-json": "cp ./generated-json/* ./json-to-convert/"
   },
   "repository": {
     "type": "git",

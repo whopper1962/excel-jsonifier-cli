@@ -1,4 +1,4 @@
-target_excel/*
+target-xlsx/*
 node_modules/*
 generated-json/*
 generated-xlsx/*
