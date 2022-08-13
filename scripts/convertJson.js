@@ -41,7 +41,7 @@ async function createExcelFile () {
     let fileName = excelFileNameResult.excelFileName;
     // const excelFileName = `${fileName}.xlsx`;
 
-    workbook.xlsx.writeFile(`${fileName}.xlsx`);
+    workbook.xlsx.writeFile(`${__dirname}/../generated-xlsx/${fileName}.xlsx`);
     displayMessage('Excelファイル(' + `${fileName}.xlsx`.green + ')が正常に作成されました。');
   } catch (error) {
     console.log(error);
