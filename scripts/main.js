@@ -218,6 +218,8 @@ async function getFileInfo (answer) {
   }
   const isNumberOfKeysAndValuesEqual = DUPLICATE_CHECKER.checkNumberOfKeysAndValues(objectBlueprint);
   if (isNumberOfKeysAndValuesEqual) {
+    const json = JSON.stringify(objectBlueprint, null, 4);
+    FILE_SYSTEM.writeFileSync(`${CURRENT_DIRECTORY_PATH}/generated-json/blueprint.json`, json);
     const duplicateCheckResults = DUPLICATE_CHECKER.checkKeyDuplicate(objectBlueprint);
     if (duplicateCheckResults.isDuplicated) {
       displayMessage('重複したキーを検知した為、処理を中断しました。\r\n以下のキーを確認してください。\r\n', duplicateCheckResults.duplicatedKey.green);
